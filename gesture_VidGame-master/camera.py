@@ -109,5 +109,6 @@ with mp_hands.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5) a
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
 
+
 cap.release()
 cv2.destroyAllWindows()
