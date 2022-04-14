@@ -7,12 +7,9 @@ import os
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 
-
 import random
 from time import sleep
 import pygame
-
-
 
 class CarRacing:
     def __init__(self):
