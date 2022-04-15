@@ -10,7 +10,7 @@ mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 joint_list =[[8,5,0]]
 
-def draw_finger_angles(image, results, joint_list):
+def draw_finger_angles(image, results, joint_list): 
     # Loop through hands 
     for hand in results.multi_hand_landmarks:
         # Loop through joint sets
