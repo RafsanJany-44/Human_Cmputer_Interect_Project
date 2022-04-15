@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import uuid
 import os
-from pynput.keyboard import Key, Controller
+from   pynput.keyboard import Key, Controller
 
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
