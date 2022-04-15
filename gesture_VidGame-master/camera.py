@@ -6,15 +6,15 @@ import uuid
 import os
 from pynput.keyboard import Key, Controller
 
-mp_drawing = mp.solutions.drawing_utils
+mp_drawing = mp.solutions.drawing_utils # taking drwaing utils
 mp_hands = mp.solutions.hands
-joint_list =[[8,5,0]]
+joint_list =[[8,5,0]]  # ladbmarks of 8,5,0
 
-def draw_finger_angles(image, results, joint_list): 
+def draw_finger_angles(image, results, joint_list):   # this line is drwaing the finger line
     # Loop through hands 
-    for hand in results.multi_hand_landmarks:
+    for hand in results.multi_hand_landmarks:  #building a loop for hand marks
         # Loop through joint sets
-        for joint in joint_list:
+        for joint in joint_list: #travversing each segment of land marks
             a = np.array([hand.landmark[joint[0]].x, hand.landmark[joint[0]].y])  # First coord
             b = np.array([hand.landmark[joint[1]].x, hand.landmark[joint[1]].y])  # Second coord
             c = np.array([hand.landmark[joint[2]].x, hand.landmark[joint[2]].y])  # Third coord
