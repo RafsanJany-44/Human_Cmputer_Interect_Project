@@ -14,10 +14,10 @@ def finger_visualization(graphics, results, mark_list):   # this line is drwaing
     # Loop through hands 
     for hand in results.multi_hand_landmarks:  #building p loop for hand marks
         # Loop through joint sets
-        for joint in mark_list: #travversing each segment of land marks
-            p = npe.array([hand.landmark[joint[0]].x, hand.landmark[joint[0]].y])  # First coord
-            q = npe.array([hand.landmark[joint[1]].x, hand.landmark[joint[1]].y])  # Second coord
-            r = npe.array([hand.landmark[joint[2]].x, hand.landmark[joint[2]].y])  # Third coord
+        for j in mark_list: #travversing each segment of land marks
+            p = npe.array([hand.landmark[j[0]].x, hand.landmark[j[0]].y])  # First coord
+            q = npe.array([hand.landmark[j[1]].x, hand.landmark[j[1]].y])  # Second coord
+            r = npe.array([hand.landmark[j[2]].x, hand.landmark[j[2]].y])  # Third coord
 
             rad = npe.arctan2(r[1] - q[1], r[0] - q[0]) - npe.arctan2(p[1] - q[1], p[0] - q[0])
             degree = npe.abs(rad * 180.0 / npe.pi) #calculating degree for decision left or right
@@ -27,33 +27,33 @@ def finger_visualization(graphics, results, mark_list):   # this line is drwaing
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA) #puting text into the monitor
     return graphics, degree
 
-def get_label(index, hand, results):  #getting the level
+def Labels(i, h, r):  #getting the level
     output = None
-    for idx, classification in enumerate(results.multi_handedness):
-        if classification.classification[0].index == index:
+    for idx, classification in enumerate(r.multi_handedness):
+        if classification.classification[0].i == i:
             # Process results
-            label = classification.classification[0].label
-            score = classification.classification[0].score
-            text = '{} {}'.format(label, round(score, 2))
+            l = classification.classification[0].l
+            s = classification.classification[0].s
+            t = '{} {}'.format(l, round(s, 2))
 
             # Extract Coordinates
-            coords = tuple(npe.multiply(
-                npe.array((hand.landmark[md_finger.HandLandmark.WRIST].x, hand.landmark[md_finger.HandLandmark.WRIST].y)),
+            cds = tuple(npe.multiply(
+                npe.array((h.landmark[md_finger.HandLandmark.WRIST].x, h.landmark[md_finger.HandLandmark.WRIST].y)),
                 [640, 480]).astype(int))
 
-            output = text, coords
+            result = t, cds
 
-    return output
+    return result
 
 
-cap = cv2.VideoCapture(0) #for vedio capturing
+caption = cv2.VideoCapture(0) #for vedio capturing
 
 with md_finger.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5) as hands:
-    while cap.isOpened():
-        ret, frame = cap.read()
+    while caption.isOpened():
+        ret, f = caption.read() #f = frame
 
         # BGR 2 RGB
-        graphics = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        graphics = cv2.cvtColor(f, cv2.COLOR_BGR2RGB)
 
         # Flip on horizontal
         graphics = cv2.flip(graphics, 1)
@@ -82,8 +82,8 @@ with md_finger.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5) 
                                     ) # drwaing each land mark and lines in hand
 
                 # Render left or right detection
-                if get_label(num, hand, results):
-                    text, coord = get_label(num, hand, results)
+                if Labels(num, hand, results):
+                    text, coord = Labels(num, hand, results)
                     cv2.putText(graphics, text, coord, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
             # Draw angles to graphics from joint list
@@ -110,5 +110,5 @@ with md_finger.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5) 
             break
 
 
-cap.release()
+caption.release()
 cv2.destroyAllWindows()
