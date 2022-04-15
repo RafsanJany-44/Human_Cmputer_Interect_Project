@@ -29,30 +29,29 @@ class CarRacing:
 
         self.crashed = False
 
-        self.carImg = pygame.image.load('./img/car.png')
+        self.car_image = pygame.image.load('./img/car.png')
         self.car_x_coordinate = (self.display_width * 0.45)
         self.car_y_coordinate = (self.display_height * 0.8)
         self.car_width = 49
 
-        # enemy_car
-        self.enemy_car = pygame.image.load('./img/enemy_car_1.png')
-        self.enemy_car_startx = random.randrange(310, 450)
-        self.enemy_car_starty = -600
-        self.enemy_car_speed = 5
-        self.enemy_car_width = 49
-        self.enemy_car_height = 100
-
+        # e_car
+        self.e_car = pygame.image.load('./img/enemy_car_1.png')
+        self.e_car_start_x = random.randrange(310, 450)
+        self.e_car_start_y = -600
+        self.e_car_velocity = 5
+        self.e_car_width = 49
+        self.e_car_height = 100
         # Background
         self.bgImg = pygame.image.load("./img/back_ground.jpg")
-        self.bg_x1 = (self.display_width / 2) - (360 / 2)
-        self.bg_x2 = (self.display_width / 2) - (360 / 2)
-        self.bg_y1 = 0
-        self.bg_y2 = -600
-        self.bg_speed = 3
+        self.background_x1 = (self.display_width / 2) - (360 / 2)
+        self.background_x2 = (self.display_width / 2) - (360 / 2)
+        self.background_y1 = 0
+        self.background_y2 = -600
+        self.background_velocity = 3
         self.count = 0
 
     def car(self, car_x_coordinate, car_y_coordinate):
-        self.gameDisplay.blit(self.carImg, (car_x_coordinate, car_y_coordinate))
+        self.gameDisplay.blit(self.car_image, (car_x_coordinate, car_y_coordinate))
 
     def racing_window(self):
         self.gameDisplay = pygame.display.set_mode((self.display_width, self.display_height))
@@ -82,21 +81,21 @@ class CarRacing:
             self.gameDisplay.fill(self.black)
             self.back_ground_raod()
 
-            self.run_enemy_car(self.enemy_car_startx, self.enemy_car_starty)
-            self.enemy_car_starty += self.enemy_car_speed
+            self.run_enemy_car(self.e_car_start_x, self.e_car_start_y)
+            self.e_car_start_y += self.e_car_velocity
 
-            if self.enemy_car_starty > self.display_height:
-                self.enemy_car_starty = 0 - self.enemy_car_height
-                self.enemy_car_startx = random.randrange(310, 450)
+            if self.e_car_start_y > self.display_height:
+                self.e_car_start_y = 0 - self.e_car_height
+                self.e_car_start_x = random.randrange(310, 450)
 
             self.car(self.car_x_coordinate, self.car_y_coordinate)
             self.highscore(self.count)
             self.count += 1
             if (self.count % 100 == 0):
-                self.enemy_car_speed += 1
-                self.bg_speed += 1
-            if self.car_y_coordinate < self.enemy_car_starty + self.enemy_car_height:
-                if self.car_x_coordinate > self.enemy_car_startx and self.car_x_coordinate < self.enemy_car_startx + self.enemy_car_width or self.car_x_coordinate + self.car_width > self.enemy_car_startx and self.car_x_coordinate + self.car_width < self.enemy_car_startx + self.enemy_car_width:
+                self.e_car_velocity += 1
+                self.background_velocity += 1
+            if self.car_y_coordinate < self.e_car_start_y + self.e_car_height:
+                if self.car_x_coordinate > self.e_car_start_x and self.car_x_coordinate < self.e_car_start_x + self.e_car_width or self.car_x_coordinate + self.car_width > self.e_car_start_x and self.car_x_coordinate + self.car_width < self.e_car_start_x + self.e_car_width:
                     self.crashed = True
                     self.display_message("Game Over !!!")
 
@@ -122,8 +121,8 @@ class CarRacing:
         self.gameDisplay.blit(self.bgImg, (self.bg_x1, self.bg_y1))
         self.gameDisplay.blit(self.bgImg, (self.bg_x2, self.bg_y2))
 
-        self.bg_y1 += self.bg_speed
-        self.bg_y2 += self.bg_speed
+        self.bg_y1 += self.background_velocity
+        self.bg_y2 += self.background_velocity
 
         if self.bg_y1 >= self.display_height:
             self.bg_y1 = -600
@@ -132,7 +131,7 @@ class CarRacing:
             self.bg_y2 = -600
 
     def run_enemy_car(self, thingx, thingy):
-        self.gameDisplay.blit(self.enemy_car, (thingx, thingy))
+        self.gameDisplay.blit(self.e_car, (thingx, thingy))
 
     def highscore(self, count):
         font = pygame.font.SysFont("arial", 20)

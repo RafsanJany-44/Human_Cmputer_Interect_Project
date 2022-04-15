@@ -10,22 +10,6 @@ md_graphics = md.solutions.drawing_utils # taking drwaing utils
 md_finger = md.solutions.hands
 mark_list =[[8,5,0]]  # ladbmarks of 8,5,0
 
-def finger_visualization(graphics, results, mark_list):   # this line is drwaing the finger line and the text in the monitor and calculating degree
-    # Loop through hands 
-    for hand in results.multi_hand_landmarks:  #building p loop for hand marks
-        # Loop through joint sets
-        for j in mark_list: #travversing each segment of land marks
-            p = npe.array([hand.landmark[j[0]].x, hand.landmark[j[0]].y])  # First coord
-            q = npe.array([hand.landmark[j[1]].x, hand.landmark[j[1]].y])  # Second coord
-            r = npe.array([hand.landmark[j[2]].x, hand.landmark[j[2]].y])  # Third coord
-
-            rad = npe.arctan2(r[1] - q[1], r[0] - q[0]) - npe.arctan2(p[1] - q[1], p[0] - q[0])
-            degree = npe.abs(rad * 180.0 / npe.pi) #calculating degree for decision left or right
-
-
-            cv2.putText(graphics, str(round(degree, 2)), tuple(npe.multiply(q, [640, 480]).astype(int)),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA) #puting text into the monitor
-    return graphics, degree
 
 def Labels(i, h, r):  #getting the level
     output = None
@@ -44,6 +28,23 @@ def Labels(i, h, r):  #getting the level
             result = t, cds
 
     return result
+
+def finger_visualization(graphics, results, mark_list):   # this line is drwaing the finger line and the text in the monitor and calculating degree
+    # Loop through hands 
+    for hand in results.multi_hand_landmarks:  #building p loop for hand marks
+        # Loop through joint sets
+        for j in mark_list: #travversing each segment of land marks
+            p = npe.array([hand.landmark[j[0]].x, hand.landmark[j[0]].y])  # First coord
+            q = npe.array([hand.landmark[j[1]].x, hand.landmark[j[1]].y])  # Second coord
+            r = npe.array([hand.landmark[j[2]].x, hand.landmark[j[2]].y])  # Third coord
+
+            rad = npe.arctan2(r[1] - q[1], r[0] - q[0]) - npe.arctan2(p[1] - q[1], p[0] - q[0])
+            degree = npe.abs(rad * 180.0 / npe.pi) #calculating degree for decision left or right
+
+
+            cv2.putText(graphics, str(round(degree, 2)), tuple(npe.multiply(q, [640, 480]).astype(int)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA) #puting text into the monitor
+    return graphics, degree
 
 
 caption = cv2.VideoCapture(0) #for vedio capturing
