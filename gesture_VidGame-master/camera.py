@@ -7,25 +7,25 @@ import os
 from pynput.keyboard import Key, Controller
 
 md_graphics = md.solutions.drawing_utils # taking drwaing utils
-md_finguir = md.solutions.hands
-land_marks =[[8,5,0]]  # ladbmarks of 8,5,0
+md_finger = md.solutions.hands
+mark_list =[[8,5,0]]  # ladbmarks of 8,5,0
 
-def draw_finger_angles(image, results, land_marks):   # this line is drwaing the finger line and the text in the monitor and calculating angle
+def finger_visualization(graphics, results, mark_list):   # this line is drwaing the finger line and the text in the monitor and calculating degree
     # Loop through hands 
-    for hand in results.multi_hand_landmarks:  #building a loop for hand marks
+    for hand in results.multi_hand_landmarks:  #building p loop for hand marks
         # Loop through joint sets
-        for joint in land_marks: #travversing each segment of land marks
-            a = npe.array([hand.landmark[joint[0]].x, hand.landmark[joint[0]].y])  # First coord
-            b = npe.array([hand.landmark[joint[1]].x, hand.landmark[joint[1]].y])  # Second coord
-            c = npe.array([hand.landmark[joint[2]].x, hand.landmark[joint[2]].y])  # Third coord
+        for joint in mark_list: #travversing each segment of land marks
+            p = npe.array([hand.landmark[joint[0]].x, hand.landmark[joint[0]].y])  # First coord
+            q = npe.array([hand.landmark[joint[1]].x, hand.landmark[joint[1]].y])  # Second coord
+            r = npe.array([hand.landmark[joint[2]].x, hand.landmark[joint[2]].y])  # Third coord
 
-            radians = npe.arctan2(c[1] - b[1], c[0] - b[0]) - npe.arctan2(a[1] - b[1], a[0] - b[0])
-            angle = npe.abs(radians * 180.0 / npe.pi) #calculating angle for decision left or right
+            rad = npe.arctan2(r[1] - q[1], r[0] - q[0]) - npe.arctan2(p[1] - q[1], p[0] - q[0])
+            degree = npe.abs(rad * 180.0 / npe.pi) #calculating degree for decision left or right
 
 
-            cv2.putText(image, str(round(angle, 2)), tuple(npe.multiply(b, [640, 480]).astype(int)),
+            cv2.putText(graphics, str(round(degree, 2)), tuple(npe.multiply(q, [640, 480]).astype(int)),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA) #puting text into the monitor
-    return image, angle
+    return graphics, degree
 
 def get_label(index, hand, results):  #getting the level
     output = None
@@ -38,7 +38,7 @@ def get_label(index, hand, results):  #getting the level
 
             # Extract Coordinates
             coords = tuple(npe.multiply(
-                npe.array((hand.landmark[md_finguir.HandLandmark.WRIST].x, hand.landmark[md_finguir.HandLandmark.WRIST].y)),
+                npe.array((hand.landmark[md_finger.HandLandmark.WRIST].x, hand.landmark[md_finger.HandLandmark.WRIST].y)),
                 [640, 480]).astype(int))
 
             output = text, coords
@@ -48,27 +48,27 @@ def get_label(index, hand, results):  #getting the level
 
 cap = cv2.VideoCapture(0) #for vedio capturing
 
-with md_finguir.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5) as hands:
+with md_finger.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5) as hands:
     while cap.isOpened():
         ret, frame = cap.read()
 
         # BGR 2 RGB
-        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        graphics = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         # Flip on horizontal
-        image = cv2.flip(image, 1)
+        graphics = cv2.flip(graphics, 1)
 
         # Set flag
-        image.flags.writeable = False
+        graphics.flags.writeable = False
 
         # Detections
-        results = hands.process(image)
+        results = hands.process(graphics)
 
         # Set flag to true
-        image.flags.writeable = True
+        graphics.flags.writeable = True
 
         # RGB 2 BGR
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        graphics = cv2.cvtColor(graphics, cv2.COLOR_RGB2BGR)
 
         # Detections
         print(results)
@@ -76,7 +76,7 @@ with md_finguir.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5)
         # Rendering results
         if results.multi_hand_landmarks:
             for num, hand in enumerate(results.multi_hand_landmarks):
-                md_graphics.draw_landmarks(image, hand, md_finguir.HAND_CONNECTIONS,
+                md_graphics.draw_landmarks(graphics, hand, md_finger.HAND_CONNECTIONS,
                                     md_graphics.DrawingSpec(color=(121, 22, 76), thickness=2, circle_radius=4),
                                     md_graphics.DrawingSpec(color=(250, 44, 250), thickness=2, circle_radius=2),
                                     ) # drwaing each land mark and lines in hand
@@ -84,27 +84,27 @@ with md_finguir.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5)
                 # Render left or right detection
                 if get_label(num, hand, results):
                     text, coord = get_label(num, hand, results)
-                    cv2.putText(image, text, coord, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+                    cv2.putText(graphics, text, coord, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
-            # Draw angles to image from joint list
-            image, angle = draw_finger_angles(image, results, land_marks) #calculating angel and drwain in image
+            # Draw angles to graphics from joint list
+            graphics, degree = finger_visualization(graphics, results, mark_list) #calculating angel and drwain in graphics
             keyboard = Controller() #calling keayboard controler
-            if angle<=180:
+            if degree<=180:
                 keyboard.press(Key.right) # the main point keay board decision function for right
                 keyboard.release(Key.right)# the main point keay board decision function for left
             else:
                 keyboard.press(Key.left)
                 keyboard.release(Key.left)
 
-        # Save our image
-        # cv2.imwrite(os.path.join('Output Images', '{}.jpg'.format(uuid.uuid1())), image)
-            cv2.rectangle(image, (0, 0), (355, 73), (214, 44, 53)) #ractangle viwing window
-            cv2.putText(image, 'Direction', (15, 12), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)#image text
-            cv2.putText(image, "Left" if angle >180 else "Right",
+        # Save our graphics
+        # cv2.imwrite(os.path.join('Output Images', '{}.jpg'.format(uuid.uuid1())), graphics)
+            cv2.rectangle(graphics, (0, 0), (355, 73), (214, 44, 53)) #ractangle viwing window
+            cv2.putText(graphics, 'Direction', (15, 12), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)#graphics text
+            cv2.putText(graphics, "Left" if degree >180 else "Right",
                         (10, 60),
                         cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
-        cv2.imshow('Hand Tracking', image)# showing the image of tracking hand
+        cv2.imshow('Hand Tracking', graphics)# showing the graphics of tracking hand
 
         if cv2.waitKey(10) & 0xFF == ord('q'): #termininate key
             break
