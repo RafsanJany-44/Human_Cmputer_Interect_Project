@@ -1,0 +1,1 @@
+ connections=mp_face_mesh.FACE_CONNECTIONS,
